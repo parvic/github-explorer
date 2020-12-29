@@ -1,44 +1,65 @@
-import React from "react";
+import React, { useState, FormEvent } from "react";
 
-import * as I from "react-icons/fi";
+import api from "../../services/api";
 
+import { FiChevronRight } from "react-icons/fi";
 import * as S from "./style";
 
-const Dashboard = () => 
-<>
-    <S.Title>Explore Github Repositories</S.Title>
-    <S.Form >
-        <input type="text" placeholder="Search repository"/>
-        <button type="submit">Search</button>
-    </S.Form>
-    <S.Repository>
-        <a href="test">
-            <img src="https://avatars1.githubusercontent.com/u/66752969?s=460&u=7db00b16fdc41f29241674672806700f782fcc5f&v=4" alt="Github Avatar"/>
-            <div>
-                <strong>parvic/proffy</strong>
-                <p>Rocketseat's Discovery bootcamp project</p>
-            </div>
-            <I.FiChevronRight size={20} />
-        </a>
+interface Repository {
+    id: number;
+    full_name: string;
+    description: string;
+    owner: {
+        login: string;
+        avatar_url: string;
+    }
+}
 
-        <a href="test">
-            <img src="https://avatars1.githubusercontent.com/u/66752969?s=460&u=7db00b16fdc41f29241674672806700f782fcc5f&v=4" alt="Github Avatar"/>
-            <div>
-                <strong>parvic/proffy</strong>
-                <p>Rocketseat's Discovery bootcamp project</p>
-            </div>
-            <I.FiChevronRight size={20} />
-        </a>
+const Dashboard = () => {
+    const [ repositories, setRepositories ] = useState<Repository[]>([]);
+    const [ newRepo, setNewRepo ] = useState('');
 
-        <a href="test">
-            <img src="https://avatars1.githubusercontent.com/u/66752969?s=460&u=7db00b16fdc41f29241674672806700f782fcc5f&v=4" alt="Github Avatar"/>
-            <div>
-                <strong>parvic/proffy</strong>
-                <p>Rocketseat's Discovery bootcamp project</p>
-            </div>
-            <I.FiChevronRight size={20} />
-        </a>
-    </S.Repository>
-</>
+    async function handleAddRepository(event: FormEvent<HTMLFormElement>):Promise<void> {
+        event.preventDefault();
+
+        const response = await api.get(`repos/${newRepo}`)
+
+        const repository = response.data
+
+        setRepositories([...repositories, repository])
+        setNewRepo('');
+
+    }
+
+    return (
+        <>
+            <S.Title>Explore Github Repositories</S.Title>
+
+            <S.Form onSubmit={handleAddRepository}>
+                <input 
+                    value={ newRepo }
+                    onChange={ (e) => setNewRepo(e.target.value) }
+                    type="text" 
+                    placeholder="Search repository"
+                />
+                <button type="submit">Search</button>
+            </S.Form>
+            
+            <S.Repositories>
+                {
+                    repositories.map(repository => (
+                        <a key={ repository.id } href={ `https://github.com/${repository.full_name}` } rel="noreferrer" target="_blank" >
+                            <img src={ repository.owner.avatar_url } alt={ repository.owner.login } />
+                            <div>
+                                <strong>{ repository.full_name }</strong>
+                                <p>{ repository.description }</p>
+                            </div>
+                            <FiChevronRight size={20} />
+                        </a>
+                    )).reverse()
+                }
+            </S.Repositories>
+        </>
+)}
 
 export default Dashboard;

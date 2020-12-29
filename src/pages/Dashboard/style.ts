@@ -49,7 +49,7 @@ export const Form = styled.form`
     }
 `;
 
-export const Repository = styled.div`
+export const Repositories = styled.div`
     margin-top: 120px;
     max-width: 700px;
 
@@ -78,13 +78,15 @@ export const Repository = styled.div`
         }
 
         img {
-            margin-right: 22px;
             width: 80px;
             height: 80px;
             border-radius: 50%;
         }
 
         div {
+            flex: 1;
+            margin: 0 22px;
+            
             strong {
                 font-size: 24px;
                 line-height: 28px;
