@@ -17,17 +17,30 @@ interface Repository {
 
 const Dashboard = () => {
     const [ repositories, setRepositories ] = useState<Repository[]>([]);
+    const [ inputError, setInputError ] = useState('');
     const [ newRepo, setNewRepo ] = useState('');
 
     async function handleAddRepository(event: FormEvent<HTMLFormElement>):Promise<void> {
         event.preventDefault();
 
-        const response = await api.get(`repos/${newRepo}`)
+        if(!newRepo) {
+            setInputError('Type an user/repository to search for a Github repository.')
+            return;
+        }
 
-        const repository = response.data
+        try {
+            const response = await api.get(`repos/${newRepo}`)
+    
+            const repository = response.data
+    
+            setRepositories([...repositories, repository])
+            setNewRepo('');
+            setInputError('');
+            
+        } catch (error) {
+            setInputError(`This user/repository doesn't exists. Try searching again.`)
+        }
 
-        setRepositories([...repositories, repository])
-        setNewRepo('');
 
     }
 
@@ -35,7 +48,7 @@ const Dashboard = () => {
         <>
             <S.Title>Explore Github Repositories</S.Title>
 
-            <S.Form onSubmit={handleAddRepository}>
+            <S.Form hasError={ !!inputError } onSubmit={handleAddRepository}>
                 <input 
                     value={ newRepo }
                     onChange={ (e) => setNewRepo(e.target.value) }
@@ -44,6 +57,8 @@ const Dashboard = () => {
                 />
                 <button type="submit">Search</button>
             </S.Form>
+
+            { inputError && <S.Error>{ inputError }</S.Error>}
             
             <S.Repositories>
                 {
