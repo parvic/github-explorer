@@ -1,4 +1,4 @@
-import React, { useState, FormEvent } from "react";
+import React, { useState, useEffect, FormEvent } from "react";
 
 import api from "../../services/api";
 
@@ -16,9 +16,21 @@ interface Repository {
 }
 
 const Dashboard = () => {
-    const [ repositories, setRepositories ] = useState<Repository[]>([]);
     const [ inputError, setInputError ] = useState('');
     const [ newRepo, setNewRepo ] = useState('');
+    const [ repositories, setRepositories ] = useState<Repository[]>(() => {
+        const storagedRepositories = localStorage.getItem('@GithubExplorer:repositories');
+
+        if(storagedRepositories) {
+            return JSON.parse(storagedRepositories);
+        } else {
+            return [];
+        }
+    });
+    
+    useEffect(() => {
+        localStorage.setItem('@GithubExplorer:repositories', JSON.stringify(repositories));
+    }, [repositories])
 
     async function handleAddRepository(event: FormEvent<HTMLFormElement>):Promise<void> {
         event.preventDefault();
@@ -40,8 +52,6 @@ const Dashboard = () => {
         } catch (error) {
             setInputError(`This user/repository doesn't exists. Try searching again.`)
         }
-
-
     }
 
     return (
