@@ -1,4 +1,5 @@
 import React, { useState, useEffect, FormEvent } from "react";
+import { Link } from "react-router-dom";
 
 import api from "../../services/api";
 
@@ -73,14 +74,14 @@ const Dashboard = () => {
             <S.Repositories>
                 {
                     repositories.map(repository => (
-                        <a key={ repository.id } href={ `https://github.com/${repository.full_name}` } rel="noreferrer" target="_blank" >
+                        <Link key={ repository.id } to={ `repository/${repository.full_name}` } >
                             <img src={ repository.owner.avatar_url } alt={ repository.owner.login } />
                             <div>
                                 <strong>{ repository.full_name }</strong>
                                 <p>{ repository.description }</p>
                             </div>
                             <FiChevronRight size={20} />
-                        </a>
+                        </Link>
                     )).reverse()
                 }
             </S.Repositories>
